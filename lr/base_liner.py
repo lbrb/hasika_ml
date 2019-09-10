@@ -30,7 +30,8 @@ class HasikaLinearRegression:
     # 不断的迭代学习
     def loop(self):
         loop_n = 0
-        while loop_n < 1000:
+        while loop_n < 10: #只遍历10次效果较差
+        # while loop_n < 10000: #遍历10000次后，效果就不错了
             gradient = self.get_gradient()
             # print("gradient: ", gradient)
             self.theta -= self.alpha * gradient

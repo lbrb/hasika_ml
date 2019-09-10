@@ -23,15 +23,16 @@ if __name__ == '__main__':
 
     # 画样本点
     plt.scatter(X, y, c='r', label='样本')
+
     # 画轮子函数线
     a = np.linspace(0, 10, 100)
     print('轮子 回归系数, 截距')
     print(liner.coef_, liner.intercept_)
     b1 = liner.intercept_ + a * liner.coef_
-
     plt.plot(a, b1, c='g', label='轮子')
+
     # 画scikit-learn类库函数线
-    print('画scikit-learn类库函数线')
+    print('scikit-learn类库 回归系数, 截距')
     print(liner2.coef_, liner2.intercept_)
     b2 = liner2.intercept_ + a * liner2.coef_
     plt.plot(a, b2, c='b', label='scikit-learn类库')
