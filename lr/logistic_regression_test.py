@@ -7,7 +7,8 @@ import matplotlib as mpl
 mpl.rcParams['font.sans-serif'] = [u'SimHei']
 mpl.rcParams['axes.unicode_minus'] = False
 
-def show_pic(X,y,line):
+
+def show_pic(X, y, line):
     x1 = np.linspace(0, 10, 1000)
     x2 = np.linspace(0, 10, 1000)
     x1, x2 = np.meshgrid(x1, x2)

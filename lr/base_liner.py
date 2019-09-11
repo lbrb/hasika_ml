@@ -30,8 +30,8 @@ class HasikaLinearRegression:
     # 不断的迭代学习
     def loop(self):
         loop_n = 0
-        while loop_n < 10: #只遍历10次效果较差
-        # while loop_n < 10000: #遍历10000次后，效果就不错了
+        while loop_n < 10:  # 只遍历10次效果较差
+            # while loop_n < 10000: #遍历10000次后，效果就不错了
             gradient = self.get_gradient()
             # print("gradient: ", gradient)
             self.theta -= self.alpha * gradient
@@ -40,12 +40,17 @@ class HasikaLinearRegression:
 
     # 获取梯度
     def get_gradient(self):
-        h_theta = np.dot(self.X, self.theta.reshape(-1, 1))
+        h_theta = self.get_h_theta(self.X)
         # print("h_theta: ", h_theta)
         loss = h_theta - self.y.reshape(-1, 1)
         # print("loss: ", loss)
         gradient = np.dot(loss.T, self.X)
         return gradient
+
+    # 计算h(\theta)
+    def get_h_theta(self, X):
+        h_theta = np.dot(X, self.theta.reshape(-1, 1))
+        return h_theta
 
     # 设置回归系数及截距
     def _set_intercept(self):
