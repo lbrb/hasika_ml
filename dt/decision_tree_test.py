@@ -57,7 +57,4 @@ if __name__ == '__main__':
     dt1.fit(X, y)
     print(dt1.print_node())
 
-    #
-    # dt2 = DecisionTreeClassifier()
-
-    # show_pic(X, y, dt1)
+    print(dt1.predict(X))

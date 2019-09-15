@@ -12,39 +12,64 @@ class HasikaDecisionTreeClassifier:
         self.X = X
         self.y = y
         ids = np.where(y != "-1")[0]
-        self.loop(ids, None)
+        self.loop((-1, ids), None)
 
     def predict(self, X):
-        yield
+        x = X[0]
+        target_node = self.find_node(x, self.node)
+        sub_y = self.y[target_node.ids]
+        y_dict = {}
+        for y in sub_y:
+            if y in y_dict.keys():
+                y_dict[y] = y_dict[y]+1
+            else:
+                y_dict[y] = 1
+        val = max(y_dict.values())
+        new_dict = {v: k for k, v in y_dict.items()}
+        key = new_dict.get(val)
+        return key
 
-    def loop(self, ids, parent):
+
+    def find_node(self, x, node):
+        feature_id = node.feature_i
+        value = x[feature_id]
+        if len(node.children) > 0:
+            for child in node.children:
+                if child.key == value:
+                    return self.find_node(x, child)
+        else:
+            return node
+
+    def loop(self, key_ids, parent):
+        key = key_ids[0]
+        ids = key_ids[1]
         top_gini = self.calc_gini(ids)
 
         if parent is None:
-            node = Node(ids, 0, None, top_gini)
+            node = Node(ids, 0, None, top_gini, key)
             self.node = node
         else:
-            node = Node(ids, parent.layer + 1, parent, top_gini)
+            node = Node(ids, parent.layer + 1, parent, top_gini, key)
             parent.add_child(node)
 
         best_feature_i = self.choose_best_feature_i(ids)
         node.set_feature_i(best_feature_i)
-        sub_samples_ids_arr = self.get_sub_samples_with_feature_i(best_feature_i,ids)
+        sub_samples_ids_dict = self.get_sub_samples_with_feature_i(best_feature_i, ids)
 
         if not self.check(node):
             return
-        for sub_samples_ids in sub_samples_ids_arr:
-            self.loop(sub_samples_ids, node)
+        for sub_samples_item in sub_samples_ids_dict.items():
+            self.loop(sub_samples_item, node)
 
     def get_sub_samples_with_feature_i(self, feature_i, ids):
         X = self.X[ids]
         feature = X[:, feature_i]
         feature_set = set(feature)
-        sub_samples_ids_arr = []
+        sub_samples_ids_dict = {}
         for feature_value in feature_set:
             sub_samples_ids = ids[np.where(feature == feature_value)[0]]
-            sub_samples_ids_arr.append(sub_samples_ids)
-        return sub_samples_ids_arr
+            sub_samples_ids_dict[feature_value] = sub_samples_ids
+        return sub_samples_ids_dict
 
     def choose_best_feature_i(self, ids):
         X = self.X[ids]
@@ -55,7 +80,7 @@ class HasikaDecisionTreeClassifier:
 
         best_feature_i = np.where(features_gini == np.min(features_gini))[0][0]
         print("best_feature_i", best_feature_i)
-        print("+"*50)
+        print("+" * 50)
         return best_feature_i
 
     # 计算按照第i个特征，进行划分，得到的gini
@@ -77,8 +102,6 @@ class HasikaDecisionTreeClassifier:
             print("feature: ", feature)
             print("sub_samples_ids: ", sub_samples_ids)
             print("sub_gini: ", gini)
-
-
 
         sum_ginis = 0
         for i in np.arange(len(sub_ns)):
