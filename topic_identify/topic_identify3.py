@@ -44,12 +44,14 @@ class SinglePassCluster:
         self.single_pass(words)
 
     def get_words(self, content):
-        words = jieba.analyse.extract_tags(content, topK=20)
-        words_tags = self.postagger.postag(words)
+        word_tfidfs = jieba.analyse.extract_tags(content, topK=20, withWeight=True)
+        words, tfidfs = zip(*word_tfidfs)
+        words_tags = self.postagger.postag(list(words))
         word_tag_dict = dict(zip(words, words_tags))
         # print("word_tag_dict:", word_tag_dict)
-        words3 = [w for w, t in word_tag_dict.items() if t in self.post_list]
-        return words3
+        effective_words = [w for w, t in word_tag_dict if t in self.post_list]
+        effective_word_tfidfs = [tuple(word, tfidf) for word, tfidf in word_tfidfs if word in effective_words]
+        return effective_word_tfidfs
 
     def get_content(self, title, content):
         multi = max((int)(len(content) / len(title)), 1)
