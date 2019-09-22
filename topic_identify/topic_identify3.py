@@ -92,8 +92,9 @@ class SinglePassCluster:
         return sim
 
     def show_result(self):
-        for i in np.arange(len(self.clusters)):
-            cluster = self.clusters[i]
+        sorted_clusters = sorted(self.clusters, key=lambda x:len(x), reverse=True)
+        for i in np.arange(len(sorted_clusters)):
+            cluster = sorted_clusters[i]
             print("cluster_", i)
             cluster_words = set()
             for j in cluster:
