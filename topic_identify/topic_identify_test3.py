@@ -29,8 +29,8 @@ def get_content_from_xlsx():
     return titles, contents
 
 
-titles, contents = get_content_from_dir()
-# titles, contents = get_content_from_xlsx()
+# titles, contents = get_content_from_dir()
+titles, contents = get_content_from_xlsx()
 
 single_pass_cluster = SinglePassCluster(stop_words_file='stop_words.txt', user_dict_file='userdict', theta=0.16)
 content_dict = dict(zip(titles, contents))
@@ -38,7 +38,7 @@ for i in np.arange(len(content_dict.items())):
     title, content = list(content_dict.items())[i]
 
     if type(title) is str and len(title) > 3:
-        print('title_', i, title)
+        # print('title_', i, title)
         single_pass_cluster.fit_transform(i, title, content)
 
 single_pass_cluster.show_result()
