@@ -88,7 +88,7 @@ class Single_Pass_Cluster(object):
     # def get_Doc2vec_vector_representation(self, word_segmentation):
     #     # 得到文本数据的空间向量表示
     #
-    #     corpus_doc2vec = [get_avg_feature_vector(i, model, num_features=50) for i in word_segmentation]
+        # corpus_doc2vec = [get_avg_feature_vector(i, model, num_features=50) for i in word_segmentation]
     #     return corpus_doc2vec
 
 
