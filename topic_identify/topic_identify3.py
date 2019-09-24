@@ -57,6 +57,10 @@ class SinglePassCluster:
         self.word_tfidfs[self.doc_id] = word_tfidfs
         self.single_pass(word_tfidfs)
 
+    def predict(self, cluster_id, title, content):
+        cluster = self.clusters[cluster_id]
+
+
     def get_words(self, content):
         word_tfidfs = jieba.analyse.extract_tags(content, topK=self.n_keywords, withWeight=True)
         words, tfidfs = zip(*word_tfidfs)
