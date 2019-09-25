@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 from topic_identify.pr_curve import HasikaPrCurve
+from topic_identify.bean import Article
 
 
 class Test:
@@ -70,43 +71,39 @@ class Test:
 
     def get_content_from_xlsx920(self):
         xlsx_path = 'output_09_24_simple.xls'
-        news_pd = pd.read_excel(xlsx_path)
-        titles = news_pd['新闻标题']
-        contents = news_pd['正文内容']
-        doc_ids = news_pd['doc_id']
+        news_df = pd.read_excel(xlsx_path)
 
-        return titles, contents, doc_ids
+        articles = []
+        for index, item in news_df.iterrows():
+            article = Article()
+            article.id = index
+            article.title = item['新闻标题']
+            article.content = item['正文内容']
+            articles.append(article)
 
-    def train(self, titles, contents, doc_ids, theta, multi_title, n_keywords):
+        return articles
+
+    def train(self, articles, theta, multi_title, n_keywords):
         self.single_pass_cluster.set_params(theta, multi_title, n_keywords)
 
-        for i in np.arange(len(titles)):
-            title = titles[i]
-            content = contents[i]
-            doc_id = doc_ids[i]
-
-            if type(title) is str and len(title) > 3:
-                # print('title_', i, title)
-                self.single_pass_cluster.fit_transform(doc_id, title, content)
-            else:
-                print("title:{}, id:{}", title, i)
+        for i in np.arange(len(articles)):
+            self.single_pass_cluster.fit_transform(articles[i])
 
         self.single_pass_cluster.show_result()
-        clusters_hat = self.single_pass_cluster.get_result()
+        clusters_hat = self.single_pass_cluster.get_cluster()
         return clusters_hat
 
     def save_clusters(self, clusters_hat):
         xlsx_path = 'output_09_24_simple.xls'
         news_df = pd.read_excel(xlsx_path)
 
-        for index, item in news_df.iterrows():
-            doc_id = item['doc_id']
-            cluster_id = self.get_cluster_id(clusters_hat, doc_id)
-            if cluster_id != -1:
-                news_df.loc[index, '聚类'] = cluster_id\
+        for cluster in clusters_hat:
+            for article in cluster.articles:
+                doc_id = article.id
+                cluster_id = article.cluster.id
+                news_df.loc[doc_id, '聚类'] = cluster_id
 
         news_df.to_excel('cluster_news.xls', encoding='utf-8')
-
 
     def get_cluster_id(self, clusters, doc_id):
         for i in np.arange(len(clusters)):
@@ -117,6 +114,6 @@ class Test:
 
 
 test = Test()
-titles, contents, doc_ids = test.get_content_from_xlsx920()
-clusters_hat = test.train(titles, contents, doc_ids, 0.60, False, 20)
+articles = test.get_content_from_xlsx920()
+clusters_hat = test.train(articles, 0.60, False, 20)
 test.save_clusters(clusters_hat)
