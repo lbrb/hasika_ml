@@ -6,10 +6,12 @@ from topic_identify.pr_curve import HasikaPrCurve
 
 
 class Test:
+    def __init__(self):
+        self.single_pass_cluster = SinglePassCluster(stop_words_file='stop_words.txt', user_dict_file='userdict')
+
     def cross_validate(self):
         # 计算得分
         pr_curve = HasikaPrCurve()
-        single_pass_cluster = SinglePassCluster(stop_words_file='stop_words.txt', user_dict_file='userdict')
 
         multi_arr = [True, False]
         theta_arr = np.logspace(-1, 0, 20)
@@ -21,10 +23,9 @@ class Test:
         for multi_title in multi_arr:
             for theta in theta_arr:
                 for n_keywords in n_keywords_arr:
-                    single_pass_cluster.set_params(theta, multi_title, n_keywords)
                     key_str = ':'.join([str(multi_title), str(theta), str(n_keywords)])
                     print(key_str)
-                    clusters_hat = self.train(single_pass_cluster, titles, contents, doc_ids)
+                    clusters_hat = self.train(titles, contents, doc_ids, theta, multi_title, n_keywords)
                     score = pr_curve.calc_score(clusters, clusters_hat)
                     result[key_str] = score
                     print(score)
@@ -67,7 +68,18 @@ class Test:
 
         return titles, contents, clusters, doc_ids
 
-    def train(self, model, titles, contents, doc_ids):
+    def get_content_from_xlsx920(self):
+        xlsx_path = 'output_09_24_simple.xls'
+        news_pd = pd.read_excel(xlsx_path)
+        titles = news_pd['新闻标题']
+        contents = news_pd['正文内容']
+        doc_ids = news_pd['doc_id']
+
+        return titles, contents, doc_ids
+
+    def train(self, titles, contents, doc_ids, theta, multi_title, n_keywords):
+        self.single_pass_cluster.set_params(theta, multi_title, n_keywords)
+
         for i in np.arange(len(titles)):
             title = titles[i]
             content = contents[i]
@@ -75,13 +87,36 @@ class Test:
 
             if type(title) is str and len(title) > 3:
                 # print('title_', i, title)
-                model.fit_transform(doc_id, title, content)
+                self.single_pass_cluster.fit_transform(doc_id, title, content)
             else:
                 print("title:{}, id:{}", title, i)
 
-        model.show_result()
-        clusters_hat = model.get_result()
+        self.single_pass_cluster.show_result()
+        clusters_hat = self.single_pass_cluster.get_result()
         return clusters_hat
 
+    def save_clusters(self, clusters_hat):
+        xlsx_path = 'output_09_24_simple.xls'
+        news_df = pd.read_excel(xlsx_path)
+
+        for index, item in news_df.iterrows():
+            doc_id = item['doc_id']
+            cluster_id = self.get_cluster_id(clusters_hat, doc_id)
+            if cluster_id != -1:
+                news_df.loc[index, '聚类'] = cluster_id\
+
+        news_df.to_excel('cluster_news.xls', encoding='utf-8')
+
+
+    def get_cluster_id(self, clusters, doc_id):
+        for i in np.arange(len(clusters)):
+            if doc_id in clusters[i]:
+                return i
+        else:
+            return -1
+
+
 test = Test()
-test.cross_validate()
+titles, contents, doc_ids = test.get_content_from_xlsx920()
+clusters_hat = test.train(titles, contents, doc_ids, 0.60, False, 20)
+test.save_clusters(clusters_hat)
