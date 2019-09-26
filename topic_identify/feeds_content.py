@@ -1,14 +1,12 @@
 import requests
 import json
 from topic_identify.bean import Article
-from elasticsearch import Elasticsearch
 import time
 import datetime
 
 
 class FeedsContent:
     def __init__(self):
-        self.es = Elasticsearch('http://10.101.93.234:9810/')
         self.url = 'http://10.101.93.234:9810/_search'
         self.payload1 = {
             "query": {
@@ -94,8 +92,14 @@ class FeedsContent:
             }
         }
 
-    def get_articles(self, keywords, size, timestamp):
-        response = requests.post(self.url, json=self.get_query(keywords, size, timestamp))
+    def get_articles(self, keywords, size, timestamp=0):
+        if timestamp == 0:
+            yestoday = datetime.date.today() - datetime.timedelta(days=10)
+            timestamp = time.mktime(yestoday.timetuple()) * 1000
+
+        query_json = self.get_query(keywords, size, timestamp)
+        print(query_json)
+        response = requests.post(self.url, json=query_json)
         json_obj = json.loads(response.text)
         articles_json = json_obj.get('hits').get('hits')
 
@@ -109,19 +113,6 @@ class FeedsContent:
             articles.append(article)
 
         return articles
-
-    def get_articles_from_es(self, keywords):
-
-        query = self.get_query(['习近平'])
-        yestoday = datetime.date.today() - datetime.timedelta(days=1)
-        timestamp = time.mktime(yestoday.timetuple()) * 1000
-
-        feeds_content = FeedsContent()
-        articles = feeds_content.get_articles(['习近平213123'], 2, timestamp)
-        # for article in articles:
-        #     # print(article.__dict__)
-        return articles
-
 
     def get_query(self, keywords, size, timestamp):
         keywords_len = len(keywords)
@@ -139,4 +130,3 @@ class FeedsContent:
             self.payload1['size'] = size
             self.payload1['query']['bool']['filter']['range']['postTime']['gt'] = timestamp
             return self.payload1
-

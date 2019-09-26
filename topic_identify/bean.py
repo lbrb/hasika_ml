@@ -48,12 +48,12 @@ class Article:
         self.effective_word_tfidfs = [(word, tfidf) for word, tfidf in word_tfidfs if word in self.effective_words]
         self.effective_word_posts = [(word, postag) for word, postag in word_tag_dict.items() if
                                      word in self.effective_words]
-
-        print(self.title)
-        print(word_tfidfs)
-        print(self.effective_word_tfidfs)
-        print(word_tag_dict)
-        print(self.effective_word_posts)
+        #
+        # print(self.title)
+        # print(word_tfidfs)
+        # print(self.effective_word_tfidfs)
+        # print(word_tag_dict)
+        # print(self.effective_word_posts)
 
     def get_content(self):
         if self.multi_title:
@@ -62,11 +62,13 @@ class Article:
                 return self.title * multi + self.content
             else:
                 return self.title
+        elif type(self.content) is not str:
+            return self.title
         else:
             return self.title + self.content
 
     def check(self):
-        if type(self.title) is str and type(self.content) is str:
+        if type(self.title) is str:
             return True
         else:
             return False

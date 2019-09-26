@@ -23,21 +23,19 @@ class Test:
 
         multi_arr = [True, False]
         theta_arr = np.logspace(-1, 0, 20)
-        n_keywords_arr = np.linspace(3, 40, 40 - 2, dtype=int)
+        n_keywords_arr = np.linspace(5, 40, 20, dtype=int)
 
-        titles, contents, clusters, doc_ids = self.get_content_from_xlsx()
+        articles, clusters = self.get_content_from_xlsx()
 
         result = {}
         for multi_title in multi_arr:
             for theta in theta_arr:
                 for n_keywords in n_keywords_arr:
                     key_str = ':'.join([str(multi_title), str(theta), str(n_keywords)])
-                    print(key_str)
-                    clusters_hat = self.train(titles, contents, doc_ids, theta, multi_title, n_keywords)
+                    clusters_hat = self.train(articles, theta, multi_title, n_keywords)
                     score = pr_curve.calc_score(clusters, clusters_hat)
                     result[key_str] = score
-                    print(score)
-                    print('-' * 50)
+
 
         result = sorted(result.items(), key=lambda item: item[1], reverse=True)
         print(result)
@@ -59,11 +57,16 @@ class Test:
         return titles, contents
 
     def get_content_from_xlsx(self):
-        xlsx_path = '爬取字段9.20.xlsx'
+        xlsx_path = 'cluster_news.xlsx'
         news_pd = pd.read_excel(xlsx_path)
-        titles = news_pd['标题']
-        contents = news_pd['正文内容']
-        doc_ids = news_pd['doc_id']
+
+        articles = []
+        for index, item in news_pd.iterrows():
+            article = Article()
+            article.id = index
+            article.title = item['新闻标题']
+            article.content = item['正文内容']
+            articles.append(article)
 
         clusters = []
         groups = news_pd.groupby('聚类')
@@ -74,7 +77,7 @@ class Test:
 
             clusters.append(cluster)
 
-        return titles, contents, clusters, doc_ids
+        return articles, clusters
 
     def get_content_from_xlsx920(self):
         xlsx_path = 'output_09_24_simple.xls'
@@ -119,8 +122,13 @@ class Test:
         else:
             return -1
 
+    def run(self):
+        articles = self.get_content_from_xlsx920()
+        clusters_hat = self.train(articles, 0.60, False, 20)
+        # self.save_clusters(clusters_hat)
 
-test = Test()
-articles = test.get_content_from_xlsx920()
-clusters_hat = test.train(articles, 0.60, False, 20)
-# test.save_clusters(clusters_hat)
+if __name__ == '__main__':
+        test = Test()
+        # test.cross_validate()
+        test.run()
+

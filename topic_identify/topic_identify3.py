@@ -11,9 +11,11 @@ from topic_identify.feeds_content import FeedsContent
 
 
 class SinglePassCluster:
-    def __init__(self, stop_words_file, user_dict_file, theta=0.40, multi_title=False, n_keywords=20):
+    def __init__(self, stop_words_file, user_dict_file):
         self.stop_words = self.get_stopwords(stop_words_file)
         self.LTP_DATA_DIR = 'E:\ltp_models\ltp_data_v3.4.0\ltp_data_v3.4.0'
+        if not os.path.exists(self.LTP_DATA_DIR):
+            self.LTP_DATA_DIR = '/home/jiaolei/nlp/ltp/ltp_data_v3.4.0'
         self.pos_model_path = os.path.join(self.LTP_DATA_DIR, 'pos.model')
         self.postagger = Postagger()  # 初始化实例
         self.postagger.load(self.pos_model_path)  # 加载模型
@@ -102,20 +104,14 @@ class SinglePassCluster:
         feeds_content = FeedsContent()
         sorted_words = cluster.get_important_words()
         effective_words = [w for w, count in sorted_words if count > 1]
-        n = 3
-        global_num = 1000
-        single_num = 100
         article_similarity = {}
-        # while n > 0 and global_num < 1000:
-        #     combinations = itertools.combinations(effective_words, n)
-        #     for words in list(combinations):
-        articles = feeds_content.get_articles(effective_words, 2, 1)
-        # print(articles)
+        articles = feeds_content.get_articles([' '.join(effective_words)], 100)
+
         for article in articles:
             if article not in article_similarity.keys():
                 article_similarity[article] = self.get_similarity_for_article_and_cluster(article, cluster)
 
-        article_similarity = sorted(article_similarity.items(), key=lambda item: item[1], reverse=True)[:3]
+        article_similarity = sorted(article_similarity.items(), key=lambda item: item[1], reverse=True)[:5]
         cluster.similarity_articles = article_similarity
 
 
