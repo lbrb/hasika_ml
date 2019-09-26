@@ -1,9 +1,16 @@
+import sys
+import os
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.append(rootPath)
+
 from topic_identify.topic_identify3 import SinglePassCluster
 import os
 import numpy as np
 import pandas as pd
 from topic_identify.pr_curve import HasikaPrCurve
 from topic_identify.bean import Article
+
 
 
 class Test:
