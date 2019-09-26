@@ -116,4 +116,4 @@ class Test:
 test = Test()
 articles = test.get_content_from_xlsx920()
 clusters_hat = test.train(articles, 0.60, False, 20)
-test.save_clusters(clusters_hat)
+# test.save_clusters(clusters_hat)

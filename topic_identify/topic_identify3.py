@@ -1,18 +1,13 @@
+import itertools
 import os
-import re
-import json
-import math
-import numpy as np
-from gensim import corpora, models, similarities, matutils
-from smart_open import smart_open
-import pandas as pd
-from pyltp import SentenceSplitter
-from textrank4zh import TextRank4Keyword, TextRank4Sentence
-from tkinter import _flatten
-from pyltp import Segmentor, Postagger
+
 import jieba.analyse
-from topic_identify.get_docs_from_feeds import FeedsContent
-from topic_identify.bean import Article, Cluster
+import numpy as np
+from gensim import matutils
+from pyltp import Postagger
+
+from topic_identify.bean import Cluster
+from topic_identify.feeds_content import FeedsContent
 
 
 class SinglePassCluster:
@@ -67,43 +62,65 @@ class SinglePassCluster:
         return cluster.id
 
     def get_max_similarity(self, article):
-        word_tfidfs = article.word_tfidfs
+        word_tfidfs = article.effective_word_tfidfs
         max_sim = 0
         max_sim_cluster_id = -1
         for i in np.arange(len(self.clusters)):
             cluster = self.clusters[i]
-            similarity = np.mean([matutils.cossim(article.word_tfidfs, word_tfidfs) for article in cluster.articles])
+            similarity = np.mean(
+                [matutils.cossim(article.effective_word_tfidfs, word_tfidfs) for article in cluster.articles])
             if similarity > max_sim:
                 max_sim = similarity
                 max_sim_cluster_id = i
 
         return max_sim, max_sim_cluster_id
 
+    def get_similarity_for_article_and_cluster(self, article, cluster):
+        article.pre_process(self.postagger, self.stop_words, self.n_keywords)
+        word_tfidfs = article.effective_word_tfidfs
+        similarity = np.mean(
+            [matutils.cossim(article.effective_word_tfidfs, word_tfidfs) for article in cluster.articles])
+
+        return similarity
+
     def get_cluster(self):
         return self.clusters
 
     def show_result(self):
-        feeds_content = FeedsContent()
-
         sorted_clusters = sorted(self.clusters, key=lambda x: len(x.articles), reverse=True)
         for i in np.arange(len(sorted_clusters)):
             cluster = sorted_clusters[i]
-            if self.check_valid(cluster):
-                cluster_words = set()
-                for article in cluster.articles:
-                    if len(cluster_words) == 0:
-                        cluster_words = set(article.word_tfidfs)
-                    else:
-                        cluster_words = cluster_words & set(article.word_tfidfs)
-                print("cluster_", i)
-                print('关键词：', cluster_words)
-                print('\n'.join([article.title for article in cluster.articles]))
-                print('-' * 50)
-            else:
-                break
+            self.get_most_similarity_article(cluster)
+            print("cluster_", i)
+            print('关键词：', cluster.get_important_words())
+            print('\n'.join([article.title for article in cluster.articles]))
+            print('内容库相关文章：')
+            print('\n'.join([article.title + str(similarity) for article, similarity in cluster.similarity_articles]))
+            print('-' * 50)
 
-    def check_valid(self, cluster):
-        if len(cluster.articles) > 2:
-            return True
-        else:
-            return False
+    def get_most_similarity_article(self, cluster):
+        feeds_content = FeedsContent()
+        sorted_words = cluster.get_important_words()
+        effective_words = [w for w, count in sorted_words if count > 1]
+        n = 3
+        global_num = 1000
+        single_num = 100
+        article_similarity = {}
+        # while n > 0 and global_num < 1000:
+        #     combinations = itertools.combinations(effective_words, n)
+        #     for words in list(combinations):
+        articles = feeds_content.get_articles(effective_words, 2, 1)
+        # print(articles)
+        for article in articles:
+            if article not in article_similarity.keys():
+                article_similarity[article] = self.get_similarity_for_article_and_cluster(article, cluster)
+
+        article_similarity = sorted(article_similarity.items(), key=lambda item: item[1], reverse=True)[:3]
+        cluster.similarity_articles = article_similarity
+
+
+def check_valid(self, cluster):
+    if len(cluster.articles) > 2:
+        return True
+    else:
+        return False

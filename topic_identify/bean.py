@@ -6,9 +6,23 @@ class Cluster:
         self.id = None
         self.articles = []
         self.keywords = []
+        self.similarity_articles = []
 
     def add_article(self, article):
         self.articles.append(article)
+
+    def get_important_words(self):
+        cluster_words = {}
+        for article in self.articles:
+            for word in article.effective_words:
+                if word in cluster_words.keys():
+                    cluster_words[word] += 1
+                else:
+                    cluster_words[word] = 1
+
+        sorted_words = sorted(cluster_words.items(), key=lambda item: item[1], reverse=True)
+
+        return sorted_words
 
 
 class Article:
@@ -17,8 +31,9 @@ class Article:
         self.title = None
         self.content = None
         self.multi_title = False
-        self.word_tfidfs = []
-        self.word_posts = []
+        self.effective_words = []
+        self.effective_word_tfidfs = []
+        self.effective_word_posts = []
         self.cluster = None
         self.post_list = ['n', 'nh', 'ni', 'nl', 'ns', 'nz', 'j', 'ws', 'a', 'z', 'b', 'v']
 
@@ -28,10 +43,17 @@ class Article:
         words, tfidfs = zip(*word_tfidfs)
         words_tags = postagger.postag(list(words))
         word_tag_dict = dict(zip(words, words_tags))
-        effective_words = [w for w, t in word_tag_dict.items() if t in self.post_list and w not in stop_words]
 
-        self.word_tfidfs = [(word, tfidf) for word, tfidf in word_tfidfs if word in effective_words]
-        self.word_posts = [(word, postag) for word, postag in word_tag_dict.items() if word in effective_words]
+        self.effective_words = [w for w, t in word_tag_dict.items() if t in self.post_list and w not in stop_words]
+        self.effective_word_tfidfs = [(word, tfidf) for word, tfidf in word_tfidfs if word in self.effective_words]
+        self.effective_word_posts = [(word, postag) for word, postag in word_tag_dict.items() if
+                                     word in self.effective_words]
+
+        print(self.title)
+        print(word_tfidfs)
+        print(self.effective_word_tfidfs)
+        print(word_tag_dict)
+        print(self.effective_word_posts)
 
     def get_content(self):
         if self.multi_title:
@@ -41,7 +63,7 @@ class Article:
             else:
                 return self.title
         else:
-            return self.title
+            return self.title + self.content
 
     def check(self):
         if type(self.title) is str and type(self.content) is str:
