@@ -31,14 +31,8 @@ class FeedsContent:
                     }
                 }
             },
-            "sort": [
-                {
-                    "postTime": {
-                        "order": "desc"
-                    }
-                }
-            ],
-            "size": 2
+            "sort": [],
+            "size": 1000
         }
         self.payload2 = {
             'query': {

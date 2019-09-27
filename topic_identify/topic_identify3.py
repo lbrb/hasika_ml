@@ -85,20 +85,20 @@ class SinglePassCluster:
 
         return similarity
 
-    def get_cluster(self):
+    def get_clusters(self):
         return self.clusters
 
     def show_result(self):
         sorted_clusters = sorted(self.clusters, key=lambda x: len(x.articles), reverse=True)
         for i in np.arange(len(sorted_clusters)):
             cluster = sorted_clusters[i]
-            self.get_most_similarity_article(cluster)
-            print("cluster_", i)
-            print('关键词：', cluster.get_important_words())
-            print('\n'.join([article.title for article in cluster.articles]))
-            print('内容库相关文章：')
-            print('\n'.join([article.title + str(similarity) for article, similarity in cluster.similarity_articles]))
-            print('-' * 50)
+            # self.get_most_similarity_article(cluster)
+            # print("cluster_", i)
+            # print('关键词：', cluster.get_important_words())
+            # print('\n'.join([article.title for article in cluster.articles]))
+            # print('内容库相关文章：')
+            # print('\n'.join([article.title + str(similarity) for article, similarity in cluster.similarity_articles]))
+            # print('-' * 50)
 
     def get_most_similarity_article(self, cluster):
         feeds_content = FeedsContent()

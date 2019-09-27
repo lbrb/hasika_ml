@@ -33,11 +33,12 @@ class Test:
                 for n_keywords in n_keywords_arr:
                     key_str = ':'.join([str(multi_title), str(theta), str(n_keywords)])
                     clusters_hat = self.train(articles, theta, multi_title, n_keywords)
-                    score = pr_curve.calc_score(clusters, clusters_hat)
-                    result[key_str] = score
+                    cluster_ids = [[article.id for article in cluster.articles]for cluster in clusters_hat]
+                    p, r = pr_curve.calc_pr(clusters, cluster_ids)
+                    result[key_str] = (p, r)
+                    print(key_str, (p, r))
 
 
-        result = sorted(result.items(), key=lambda item: item[1], reverse=True)
         print(result)
 
     def get_content_from_dir(self):
@@ -61,6 +62,7 @@ class Test:
         news_pd = pd.read_excel(xlsx_path)
 
         articles = []
+        clusters_dict = {}
         for index, item in news_pd.iterrows():
             article = Article()
             article.id = index
@@ -68,16 +70,15 @@ class Test:
             article.content = item['正文内容']
             articles.append(article)
 
-        clusters = []
-        groups = news_pd.groupby('聚类')
-        for group in groups:
-            cluster = []
-            for doc_id in group[1]['doc_id']:
-                cluster.append(doc_id)
+            cluster_id = item['聚类']
+            if cluster_id in clusters_dict.keys():
+                clusters_dict[cluster_id].append(index)
+            else:
+                clusters_dict[cluster_id] = [index]
 
-            clusters.append(cluster)
+        clusters_dict = list(clusters_dict.values())
 
-        return articles, clusters
+        return articles, clusters_dict
 
     def get_content_from_xlsx920(self):
         xlsx_path = 'output_09_24_simple.xls'
@@ -100,7 +101,7 @@ class Test:
             self.single_pass_cluster.fit_transform(articles[i])
 
         self.single_pass_cluster.show_result()
-        clusters_hat = self.single_pass_cluster.get_cluster()
+        clusters_hat = self.single_pass_cluster.get_clusters()
         return clusters_hat
 
     def save_clusters(self, clusters_hat):
@@ -129,6 +130,6 @@ class Test:
 
 if __name__ == '__main__':
         test = Test()
-        # test.cross_validate()
-        test.run()
+        test.cross_validate()
+        # test.run()
 

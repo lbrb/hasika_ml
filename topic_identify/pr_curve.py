@@ -39,11 +39,11 @@ class HasikaPrCurve:
         score = (ss + dd) / (ss + sd + ds + dd)
         return score
 
-    def calc_precision(self, y, y_hat):
-        return 0
-
-    def calc_recall(self, y, y_hat):
-        return 0
+    def calc_pr(self, y, y_hat):
+        ss, sd, ds, dd = self.calc_mat(y, y_hat)
+        p = ss / (ss + ds)
+        r = ss / (ss + sd)
+        return p, r
 
     def get_cluster_id(self, clusters, doc_id):
         for i in np.arange(len(clusters)):
