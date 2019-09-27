@@ -28,21 +28,19 @@ class Test:
 
         articles, clusters = self.get_content_from_xlsx()
 
-        result = {}
+        f = open('result.txt', mode='w', encoding='utf-8')
         for multi_title in multi_arr:
             for theta in theta_arr:
                 for n_keywords in n_keywords_arr:
-                    key_str = ':'.join([str(multi_title), str(theta), str(n_keywords)])
+                    key_str = ' '.join([str(multi_title), str(theta), str(n_keywords)])
                     clusters_hat = self.train(articles, theta, multi_title, n_keywords)
                     cluster_ids = [[article.id for article in cluster.articles] for cluster in clusters_hat]
                     p, r = pr_curve.calc_pr(clusters, cluster_ids)
-                    result[key_str] = (p, r)
-                    print(key_str, (p, r))
-
-        f = open('result.txt', mode='w', encoding='utf-8')
-        json.dump(result, f)
+                    line = key_str + str(p) + str(r)
+                    print(key_str, p, r)
+                    f.write(line+'\n')
+                    f.flush()
         f.close()
-        print(result)
 
     def get_content_from_dir(self):
         # news_dir = os.walk('E:\新闻列表')
