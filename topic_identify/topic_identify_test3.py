@@ -1,5 +1,6 @@
 import sys
 import os
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
@@ -10,7 +11,7 @@ import numpy as np
 import pandas as pd
 from topic_identify.pr_curve import HasikaPrCurve
 from topic_identify.bean import Article
-
+import json
 
 
 class Test:
@@ -33,12 +34,14 @@ class Test:
                 for n_keywords in n_keywords_arr:
                     key_str = ':'.join([str(multi_title), str(theta), str(n_keywords)])
                     clusters_hat = self.train(articles, theta, multi_title, n_keywords)
-                    cluster_ids = [[article.id for article in cluster.articles]for cluster in clusters_hat]
+                    cluster_ids = [[article.id for article in cluster.articles] for cluster in clusters_hat]
                     p, r = pr_curve.calc_pr(clusters, cluster_ids)
                     result[key_str] = (p, r)
                     print(key_str, (p, r))
 
-
+        f = open('result.txt', mode='', encoding='utf-8')
+        json.dump(result, f)
+        f.close()
         print(result)
 
     def get_content_from_dir(self):
@@ -128,8 +131,8 @@ class Test:
         clusters_hat = self.train(articles, 0.60, False, 20)
         # self.save_clusters(clusters_hat)
 
-if __name__ == '__main__':
-        test = Test()
-        test.cross_validate()
-        # test.run()
 
+if __name__ == '__main__':
+    test = Test()
+    test.cross_validate()
+    # test.run()
