@@ -33,7 +33,7 @@ class SinglePassCluster:
 
     def fit_transform(self, article):
         if article.check():
-            article.pre_process(self.postagger, self.stop_words, self.n_keywords)
+            article.pre_process(self.postagger, self.stop_words, self.n_keywords, self.multi_title)
             return self.single_pass(article)
         else:
             return None

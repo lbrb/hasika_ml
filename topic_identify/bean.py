@@ -1,5 +1,5 @@
 import jieba.analyse
-
+import numpy as np
 
 class Cluster:
     def __init__(self):
@@ -30,15 +30,14 @@ class Article:
         self.id = None
         self.title = None
         self.content = None
-        self.multi_title = False
         self.effective_words = []
         self.effective_word_tfidfs = []
         self.effective_word_posts = []
         self.cluster = None
         self.post_list = ['n', 'nh', 'ni', 'nl', 'ns', 'nz', 'j', 'ws', 'a', 'z', 'b', 'v']
 
-    def pre_process(self, postagger, stop_words, n_keywords):
-        content = self.get_content()
+    def pre_process(self, postagger, stop_words, n_keywords, multi_title):
+        content = self.get_content(multi_title)
         word_tfidfs = jieba.analyse.extract_tags(content, topK=n_keywords, withWeight=True)
         words, tfidfs = zip(*word_tfidfs)
         words_tags = postagger.postag(list(words))
@@ -55,10 +54,11 @@ class Article:
         # print(word_tag_dict)
         # print(self.effective_word_posts)
 
-    def get_content(self):
-        if self.multi_title:
+    def get_content(self, multi_title):
+        if multi_title:
             if type(self.content) is str and len(self.content) > 5:
-                multi = max((int)(len(self.content) / len(self.title)), 1)
+                log2 = np.log2((len(self.content) / len(self.title)))
+                multi = int(max(log2, 1))
                 return self.title * multi + self.content
             else:
                 return self.title

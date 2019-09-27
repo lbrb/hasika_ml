@@ -134,5 +134,5 @@ class Test:
 
 if __name__ == '__main__':
     test = Test()
-    # test.cross_validate()
-    test.run()
+    test.cross_validate()
+    # test.run()
