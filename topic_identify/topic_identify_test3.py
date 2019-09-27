@@ -100,7 +100,7 @@ class Test:
         for i in np.arange(len(articles)):
             self.single_pass_cluster.fit_transform(articles[i])
 
-        self.single_pass_cluster.show_result()
+        # self.single_pass_cluster.show_result()
         clusters_hat = self.single_pass_cluster.get_clusters()
         return clusters_hat
 
