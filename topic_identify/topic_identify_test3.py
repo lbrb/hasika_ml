@@ -36,9 +36,9 @@ class Test:
                     clusters_hat = self.train(articles, theta, multi_title, n_keywords)
                     cluster_ids = [[article.id for article in cluster.articles] for cluster in clusters_hat]
                     p, r = pr_curve.calc_pr(clusters, cluster_ids)
-                    line = key_str + str(p) + str(r)
+                    line = key_str + ' ' + str(p) + ' ' + str(r)
                     print(key_str, p, r)
-                    f.write(line+'\n')
+                    f.write(line + '\n')
                     f.flush()
         f.close()
 
