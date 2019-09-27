@@ -88,7 +88,7 @@ class FeedsContent:
 
     def get_articles(self, keywords, size, timestamp=0):
         if timestamp == 0:
-            yestoday = datetime.date.today() - datetime.timedelta(days=10)
+            yestoday = datetime.date.today() - datetime.timedelta(days=2)
             timestamp = time.mktime(yestoday.timetuple()) * 1000
 
         query_json = self.get_query(keywords, size, timestamp)

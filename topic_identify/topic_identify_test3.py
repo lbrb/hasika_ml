@@ -39,7 +39,7 @@ class Test:
                     result[key_str] = (p, r)
                     print(key_str, (p, r))
 
-        f = open('result.txt', mode='', encoding='utf-8')
+        f = open('result.txt', mode='w', encoding='utf-8')
         json.dump(result, f)
         f.close()
         print(result)
@@ -128,11 +128,11 @@ class Test:
 
     def run(self):
         articles = self.get_content_from_xlsx920()
-        clusters_hat = self.train(articles, 0.60, False, 20)
+        clusters_hat = self.train(articles, 0.545, True, 20)
         # self.save_clusters(clusters_hat)
 
 
 if __name__ == '__main__':
     test = Test()
-    test.cross_validate()
-    # test.run()
+    # test.cross_validate()
+    test.run()

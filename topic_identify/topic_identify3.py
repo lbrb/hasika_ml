@@ -114,9 +114,8 @@ class SinglePassCluster:
         article_similarity = sorted(article_similarity.items(), key=lambda item: item[1], reverse=True)[:5]
         cluster.similarity_articles = article_similarity
 
-
-def check_valid(self, cluster):
-    if len(cluster.articles) > 2:
-        return True
-    else:
-        return False
+    def check_valid(self, cluster):
+        if len(cluster.articles) > 2:
+            return True
+        else:
+            return False
