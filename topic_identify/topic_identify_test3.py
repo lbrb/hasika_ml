@@ -23,7 +23,7 @@ class Test:
         pr_curve = HasikaPrCurve()
 
         multi_arr = [True, False]
-        theta_arr = np.linesapce(0.1, 1, 20)
+        theta_arr = np.linspace(0.1, 1, 20)
         n_keywords_arr = np.linspace(1, 40, 20, dtype=int)
 
         articles, clusters = self.get_content_from_xlsx()
