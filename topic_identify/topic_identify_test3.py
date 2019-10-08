@@ -81,8 +81,8 @@ class Test:
 
         return articles, clusters_dict
 
-    def get_content_from_xlsx920(self):
-        xlsx_path = 'output_09_24_simple.xls'
+    def get_content_from_xlsx920(self, xlsx_path):
+
         news_df = pd.read_excel(xlsx_path)
 
         articles = []
@@ -101,12 +101,11 @@ class Test:
         for i in np.arange(len(articles)):
             self.single_pass_cluster.fit_transform(articles[i])
 
-        # self.single_pass_cluster.show_result()
+        self.single_pass_cluster.show_result()
         clusters_hat = self.single_pass_cluster.get_clusters()
         return clusters_hat
 
-    def save_clusters(self, clusters_hat):
-        xlsx_path = 'output_09_24_simple.xls'
+    def save_clusters(self, clusters_hat, xlsx_path):
         news_df = pd.read_excel(xlsx_path)
 
         for cluster in clusters_hat:
@@ -115,7 +114,8 @@ class Test:
                 cluster_id = article.cluster.id
                 news_df.loc[doc_id, '聚类'] = cluster_id
 
-        news_df.to_excel('cluster_news.xls', encoding='utf-8')
+        file_name = xlsx_path.split('.')[0] + "cluster.xlsx"
+        news_df.to_excel(file_name, encoding='utf-8')
 
     def get_cluster_id(self, clusters, doc_id):
         for i in np.arange(len(clusters)):
@@ -125,12 +125,13 @@ class Test:
             return -1
 
     def run(self):
-        articles = self.get_content_from_xlsx920()
-        clusters_hat = self.train(articles, 0.545, True, 20)
-        # self.save_clusters(clusters_hat)
+        xlsx_path = 'cluster_news_人工聚类_930.xls'
+        articles = self.get_content_from_xlsx920(xlsx_path)
+        clusters_hat = self.train(articles, 0.50, True, 21)
+        self.save_clusters(clusters_hat, xlsx_path)
 
 
 if __name__ == '__main__':
     test = Test()
-    test.cross_validate()
-    # test.run()
+    # test.cross_validate()
+    test.run()

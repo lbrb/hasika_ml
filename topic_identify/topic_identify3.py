@@ -64,13 +64,13 @@ class SinglePassCluster:
         return cluster.id
 
     def get_max_similarity(self, article):
-        word_tfidfs = article.effective_word_tfidfs
+        word_tfidfs = article.title_content_effective_word_tfidfs
         max_sim = 0
         max_sim_cluster_id = -1
         for i in np.arange(len(self.clusters)):
             cluster = self.clusters[i]
             similarity = np.mean(
-                [matutils.cossim(article.effective_word_tfidfs, word_tfidfs) for article in cluster.articles])
+                [matutils.cossim(article.title_content_effective_word_tfidfs, word_tfidfs) for article in cluster.articles])
             if similarity > max_sim:
                 max_sim = similarity
                 max_sim_cluster_id = i
@@ -79,9 +79,9 @@ class SinglePassCluster:
 
     def get_similarity_for_article_and_cluster(self, article, cluster):
         article.pre_process(self.postagger, self.stop_words, self.n_keywords)
-        word_tfidfs = article.effective_word_tfidfs
+        word_tfidfs = article.title_content_effective_word_tfidfs
         similarity = np.mean(
-            [matutils.cossim(article.effective_word_tfidfs, word_tfidfs) for article in cluster.articles])
+            [matutils.cossim(article.title_content_effective_word_tfidfs, word_tfidfs) for article in cluster.articles])
 
         return similarity
 
@@ -93,12 +93,12 @@ class SinglePassCluster:
         for i in np.arange(len(sorted_clusters)):
             cluster = sorted_clusters[i]
             # self.get_most_similarity_article(cluster)
-            # print("cluster_", i)
-            # print('关键词：', cluster.get_important_words())
-            # print('\n'.join([article.title for article in cluster.articles]))
+            print("cluster_", i)
+            print('关键词：', cluster.get_important_words())
+            print('\n'.join([article.title for article in cluster.articles]))
             # print('内容库相关文章：')
             # print('\n'.join([article.title + str(similarity) for article, similarity in cluster.similarity_articles]))
-            # print('-' * 50)
+            print('-' * 50)
 
     def get_most_similarity_article(self, cluster):
         feeds_content = FeedsContent()
