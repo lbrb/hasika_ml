@@ -127,7 +127,7 @@ class Test:
     def run(self):
         xlsx_path = 'cluster_news_人工聚类_930.xls'
         articles = self.get_content_from_xlsx920(xlsx_path)
-        clusters_hat = self.train(articles, 0.50, True, 21)
+        clusters_hat = self.train(articles, 0.55, True, 21)
         self.save_clusters(clusters_hat, xlsx_path)
 
 

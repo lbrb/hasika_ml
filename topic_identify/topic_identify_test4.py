@@ -125,11 +125,11 @@ class Test:
     def run(self):
         xlsx_path = 'cluster_news_人工聚类_930.xls'
         articles = self.get_content_from_xlsx920(xlsx_path)
-        clusters_hat = self.train(articles, 0.55, True, 21)
+        clusters_hat = self.train(articles, 0.47, 0.58)
         self.save_clusters(clusters_hat, xlsx_path)
 
 
 if __name__ == '__main__':
     test = Test()
-    test.cross_validate()
-    # test.run()
+    # test.cross_validate()
+    test.run()
