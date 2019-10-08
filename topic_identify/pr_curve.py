@@ -14,11 +14,11 @@ class HasikaPrCurve:
             else:
                 samples.append(xs)
 
-        for index in np.arange(y):
+        for index in np.arange(len(y)):
             for doc_id in y[index]:
                 self.y_h[doc_id] = index
 
-        for index in np.arange(y_hat):
+        for index in np.arange(len(y_hat)):
             for doc_id in y_hat[index]:
                 self.y_hat_h[doc_id] = index
 
@@ -32,6 +32,9 @@ class HasikaPrCurve:
                 doc_id2 = samples[j]
                 i_cluster_id_y = self.y_h[doc_id1]
                 j_cluster_id_y = self.y_h[doc_id2]
+
+                if doc_id1 not in self.y_hat_h.keys() or doc_id2 not in self.y_hat_h.keys():
+                    continue
 
                 i_cluster_id_y_hat = self.y_hat_h[doc_id1]
                 j_cluster_id_y_hat = self.y_hat_h[doc_id2]
