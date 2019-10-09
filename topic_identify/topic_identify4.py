@@ -50,8 +50,19 @@ class SinglePassCluster:
     def single_pass(self, article):
         title_content_max_sim, title_content_max_sim_cluster_id, content_max_sim, content_max_sim_cluster_id, title_max_sim, title_max_sim_cluster_id = self.get_max_similarity(article)
         cluster = None
-        if title_max_sim > self.title_theta or content_max_sim > self.content_theta:
+
+        title_sim_diff = title_max_sim - self.title_theta
+        content_sim_diff = content_max_sim - self.content_theta
+
+        if title_sim_diff > 0 and content_sim_diff > 0:
+            if title_sim_diff > content_sim_diff:
+                cluster = self.clusters[title_max_sim_cluster_id]
+            else:
+                cluster = self.clusters[content_max_sim_cluster_id]
+        elif title_sim_diff > 0:
             cluster = self.clusters[title_max_sim_cluster_id]
+        elif content_sim_diff > 0:
+            cluster = self.clusters[content_max_sim_cluster_id]
         else:
             cluster = Cluster()
             cluster.id = len(self.clusters)
