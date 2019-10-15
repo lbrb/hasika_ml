@@ -69,7 +69,7 @@ class Test:
             article.content = item['正文内容']
             articles.append(article)
 
-            cluster_id = item['聚类']
+            cluster_id = item['人工']
             if cluster_id in clusters_dict.keys():
                 clusters_dict[cluster_id].append(index)
             else:
