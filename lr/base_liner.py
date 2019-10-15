@@ -22,6 +22,7 @@ class HasikaLinearRegression:
         self.theta = np.ones(self.X.shape[1]).reshape(1, -1)
         self.y = y
         print("X: ", X)
+        print("X: ", self.X)
         print("y: ", y)
         print("theta: ", self.theta)
         self.loop()
@@ -33,7 +34,7 @@ class HasikaLinearRegression:
         while loop_n < 10:  # 只遍历10次效果较差
             # while loop_n < 10000: #遍历10000次后，效果就不错了
             gradient = self.get_gradient()
-            # print("gradient: ", gradient)
+            print("gradient: ", gradient)
             self.theta -= self.alpha * gradient
             print("theta: ", self.theta)
             loop_n += 1
@@ -41,9 +42,9 @@ class HasikaLinearRegression:
     # 获取梯度
     def get_gradient(self):
         h_theta = self.get_h_theta(self.X)
-        # print("h_theta: ", h_theta)
+        print("h_theta: ", h_theta)
         loss = h_theta - self.y.reshape(-1, 1)
-        # print("loss: ", loss)
+        print("loss: ", loss)
         gradient = np.dot(loss.T, self.X)
         return gradient
 
