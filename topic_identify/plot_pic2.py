@@ -13,8 +13,8 @@ value2s = []
 f1s = []
 result_dict = {}
 
-df = pd.read_csv('result3.txt', encoding='utf-8', sep=' ')
-df1 = df[(df['r'] > 0.7) & (df['p'] > 0.8)]
+df = pd.read_csv('result.txt', encoding='utf-8', sep=' ')
+df1 = df[(df['r'] > 0.1) & (df['p'] > 0.1)]
 print(df1)
 print(np.mean(df1['title_theta']))
 print(np.mean(df1['content_theta']))

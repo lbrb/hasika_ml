@@ -112,7 +112,7 @@ class Test:
             for article in cluster.articles:
                 doc_id = article.id
                 cluster_id = article.cluster.id
-                news_df.loc[doc_id, '聚类'] = cluster_id
+                news_df.loc[doc_id, '机器'] = cluster_id
 
         file_name = xlsx_path.split('.')[0] + "cluster.xlsx"
         news_df.to_excel(file_name, encoding='utf-8')
@@ -125,9 +125,9 @@ class Test:
             return -1
 
     def run(self):
-        xlsx_path = 'cluster_news_人工聚类_930.xls'
+        xlsx_path = 'news1.xlsx'
         articles = self.get_content_from_xlsx920(xlsx_path)
-        clusters_hat = self.train(articles, 0.55, True, 21)
+        clusters_hat = self.train(articles, 0.90, False, 21)
         self.save_clusters(clusters_hat, xlsx_path)
 
 
